@@ -19,7 +19,7 @@ export const getEnvironmentVariables = (): EnvironmentVariables => {
       process.env.MONGODB_URI || "mongodb://localhost:27017/movie-app",
     MONGODB_LOCAL_URI:
       process.env.MONGODB_LOCAL_URI || "mongodb://localhost:27017/movie-app",
-    USE_LOCAL_DB: process.env.USE_LOCAL_DB === "false",
+    USE_LOCAL_DB: process.env.USE_LOCAL_DB === "true",
     JWT_SECRET: process.env.JWT_SECRET || "",
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "10d",
     TMDB_API_KEY: process.env.TMDB_API_KEY || "",
