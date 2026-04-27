@@ -7,7 +7,7 @@ const testDatabaseConnection = async () => {
   try {
     await connectDB();
 
-    console.log("\n✅ database.ts is working correctly!");
+    console.log(" database.ts is working correctly!");
 
     await disconnectDB();
     process.exit(0);

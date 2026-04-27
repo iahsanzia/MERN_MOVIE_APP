@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
+import dns from "node:dns";
 import { getEnvironmentVariables } from "./environment";
 
 const env = getEnvironmentVariables();
 
 export const connectDB = async (): Promise<void> => {
   try {
+    if (env.DNS_SERVERS.length > 0) {
+      dns.setServers(env.DNS_SERVERS);
+      console.log(`Using custom DNS servers: ${env.DNS_SERVERS.join(", ")}`);
+    }
+
     const mongoUri = env.USE_LOCAL_DB ? env.MONGODB_LOCAL_URI : env.MONGODB_URI;
 
     if (!mongoUri) {

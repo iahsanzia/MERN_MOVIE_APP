@@ -3,6 +3,7 @@ export interface EnvironmentVariables {
   PORT: number;
   MONGODB_URI: string;
   MONGODB_LOCAL_URI: string;
+  DNS_SERVERS: string[];
   JWT_SECRET: string;
   USE_LOCAL_DB: boolean;
   JWT_EXPIRES_IN: string;
@@ -19,6 +20,10 @@ export const getEnvironmentVariables = (): EnvironmentVariables => {
       process.env.MONGODB_URI || "mongodb://localhost:27017/movie-app",
     MONGODB_LOCAL_URI:
       process.env.MONGODB_LOCAL_URI || "mongodb://localhost:27017/movie-app",
+    DNS_SERVERS: (process.env.DNS_SERVERS || "")
+      .split(",")
+      .map((server) => server.trim())
+      .filter(Boolean),
     USE_LOCAL_DB: process.env.USE_LOCAL_DB === "true",
     JWT_SECRET: process.env.JWT_SECRET || "",
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "10d",
