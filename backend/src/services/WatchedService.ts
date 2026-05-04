@@ -154,3 +154,5 @@ class WatchedService {
     };
   }
 }
+
+export default new WatchedService();
