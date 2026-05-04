@@ -29,7 +29,7 @@ class MovieController {
     }
   }
 
-  async getAllMovies(req: Request, res: Response): Promise<void> {
+  async getAllMovies(_req: Request, res: Response): Promise<void> {
     try {
       const movies = await MovieService.getAllMovies();
 
