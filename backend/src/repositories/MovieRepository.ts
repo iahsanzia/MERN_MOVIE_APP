@@ -41,7 +41,7 @@ class MovieRepository {
   }
 
   async searchByTitle(title: string): Promise<IMovie[]> {
-    return await Movie.find({ title: new RegExp(title, "i") });
+    return await Movie.find({ title: { $regex: title, $options: "i" } });
   }
 
   async findByTitle(title: string): Promise<IMovie | null> {
