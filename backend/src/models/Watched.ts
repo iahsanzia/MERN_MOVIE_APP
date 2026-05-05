@@ -3,20 +3,23 @@ export interface IWatched extends Document {
   userId: mongoose.Types.ObjectId;
   movieId: number;
   title: string;
-  description: string;
+  summary: string;
   releaseDate: Date;
   genres: string[];
   director: string;
   cast: string[];
   rating: number;
   WatchedAt: Date;
+  posterPath: string;
 }
 
 const watchedSchema: Schema<IWatched> = new Schema({
   userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+  posterPath: { type: String, required: true },
+
   movieId: { type: Number, required: true },
   title: { type: String, required: true },
-  description: { type: String, required: true },
+  summary: { type: String, required: true },
   releaseDate: { type: Date, required: true },
   genres: { type: [String], default: [] },
   director: { type: String, required: true },
