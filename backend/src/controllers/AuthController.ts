@@ -3,40 +3,32 @@ import { AuthService, UserService } from "../services";
 
 class AuthController {
   async register(req: Request, res: Response): Promise<void> {
-    try {
-      const { email, password, username } = req.body;
+    const { email, password, username } = req.body;
 
-      if (!email || !password || !username) {
-        res.status(400).json({
-          status: "error",
-          message: "Email, password and username are required",
-        });
-        return;
-      }
-      const { user, token } = await UserService.register(
-        email,
-        password,
-        username,
-      );
-      res.status(201).json({
-        status: "success",
-        message: "User registered successfully",
-        data: {
-          user: {
-            id: user._id,
-            email: user.email,
-            username: user.username,
-          },
-          token,
-        },
-      });
-    } catch (error: any) {
-      res.status(500).json({
+    if (!email || !password || !username) {
+      res.status(400).json({
         status: "error",
-        message: "Internal server error",
-        error: error.message,
+        message: "Email, password and username are required",
       });
+      return;
     }
+    const { user, token } = await UserService.register(
+      email,
+      password,
+      username,
+    );
+    res.status(201).json({
+      status: "success",
+      message: "User registered successfully",
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          username: user.username,
+        },
+        token,
+      },
+    });
   }
 
   async login(req: Request, res: Response): Promise<void> {
