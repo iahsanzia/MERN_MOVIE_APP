@@ -1,16 +1,13 @@
 import { Request, Response } from "express";
 import { AuthService, UserService } from "../services";
+import { AppError } from "../utils";
 
 class AuthController {
   async register(req: Request, res: Response): Promise<void> {
     const { email, password, username } = req.body;
 
     if (!email || !password || !username) {
-      res.status(400).json({
-        status: "error",
-        message: "Email, password and username are required",
-      });
-      return;
+      throw new AppError("Email,Password and Username are required", 400);
     }
     const { user, token } = await UserService.register(
       email,
@@ -32,63 +29,41 @@ class AuthController {
   }
 
   async login(req: Request, res: Response): Promise<void> {
-    try {
-      const { email, password } = req.body;
-      if (!email || !password) {
-        res.status(400).json({
-          status: "error",
-          message: "Email and password are required",
-        });
-        return;
-      }
-
-      const { user, token } = await UserService.login(email, password);
-      res.status(200).json({
-        status: "success",
-        message: "User logged in successfully",
-        data: {
-          user: {
-            id: user._id,
-            email: user.email,
-            username: user.username,
-          },
-          token,
-        },
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        status: "error",
-        message: "Internal server error",
-        error: error.message,
-      });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      throw new AppError("Email and Password are required", 400);
     }
+
+    const { user, token } = await UserService.login(email, password);
+    res.status(200).json({
+      status: "success",
+      message: "User logged in successfully",
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          username: user.username,
+        },
+        token,
+      },
+    });
   }
   async verifyToken(req: Request, res: Response): Promise<void> {
-    try {
-      const token = req.headers.authorization?.split(" ")[1];
-      if (!token) {
-        res.status(401).json({ status: "error", message: "Token is required" });
-        return;
-      }
-      const decoded = await AuthService.verifyToken(token);
-
-      if (!decoded) {
-        res.status(401).json({ status: "error", message: "Invalid token" });
-        return;
-      }
-
-      res.status(200).json({
-        status: "success",
-        message: "Token is valid",
-        data: { userId: decoded.userId },
-      });
-    } catch (error: any) {
-      res.status(500).json({
-        status: "error",
-        message: "Internal server error",
-        error: error.message,
-      });
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      throw new AppError("Token is required", 401);
     }
+    const decoded = await AuthService.verifyToken(token);
+
+    if (!decoded) {
+      throw new AppError("Invalid Token", 401);
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Token is valid",
+      data: { userId: decoded.userId },
+    });
   }
 }
 
