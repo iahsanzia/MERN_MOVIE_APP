@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { MovieService } from "../services";
-// type IdParams = { id: string };
 
 class MovieController {
   async createMovie(req: Request, res: Response): Promise<void> {
