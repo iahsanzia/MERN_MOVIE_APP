@@ -11,7 +11,7 @@ import { getEnvironmentVariables } from "../config/environment";
 
 const env = getEnvironmentVariables();
 
-const TMDB_API_KEY = env.TMDB_API_KEY;
+const TMDB_BEARER_TOKEN = env.TMDB_BEARER_TOKEN;
 const TMDB_BASE_URL = env.TMDB_BASE_URL;
 console.log("Controller loaded11");
 
@@ -26,17 +26,19 @@ class TmdbService {
 
     try {
       console.log("Request Sent");
-      if (!TMDB_API_KEY) {
-        throw new Error("TMDB_API_KEY not configured");
+      if (!TMDB_BEARER_TOKEN) {
+        throw new Error("TMDB_BEARER_TOKEN not configured");
       }
       console.log("API CLEARED");
       const response = await axios.get<TmdbSearchResponse>(
         `${TMDB_BASE_URL}/search/movie`,
         {
           params: {
-            api_key: TMDB_API_KEY,
             query,
             page,
+          },
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -50,7 +52,6 @@ class TmdbService {
       console.log("Status:", error.response?.status);
       console.log("Data:", JSON.stringify(error.response?.data, null, 2));
       console.log("Params:", {
-        api_key: TMDB_API_KEY,
         query,
         page,
       });
@@ -70,8 +71,10 @@ class TmdbService {
         `${TMDB_BASE_URL}/movie/${movieId}`,
         {
           params: {
-            api_key: TMDB_API_KEY,
             append_to_response: "credits",
+          },
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -86,8 +89,8 @@ class TmdbService {
       const response = await axios.get<TmdbTrendingResponse>(
         `${TMDB_BASE_URL}/trending/movie/${timeWindow}`,
         {
-          params: {
-            api_key: TMDB_API_KEY,
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -104,8 +107,10 @@ class TmdbService {
     try {
       const response = await axios.get(`${TMDB_BASE_URL}/movie/top_rated`, {
         params: {
-          api_key: TMDB_API_KEY,
           page,
+        },
+        headers: {
+          Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
         },
       });
       return {
@@ -121,8 +126,10 @@ class TmdbService {
     try {
       const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
         params: {
-          api_key: TMDB_API_KEY,
           page,
+        },
+        headers: {
+          Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
         },
       });
       return {
@@ -138,9 +145,11 @@ class TmdbService {
     try {
       const response = await axios.get(`${TMDB_BASE_URL}/discover/movie`, {
         params: {
-          api_key: TMDB_API_KEY,
           with_genres: genreId,
           page,
+        },
+        headers: {
+          Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
         },
       });
       return {
@@ -157,8 +166,8 @@ class TmdbService {
       const response = await axios.get<TmdbGenreResponse>(
         `${TMDB_BASE_URL}/genre/movie/list`,
         {
-          params: {
-            api_key: TMDB_API_KEY,
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -176,8 +185,8 @@ class TmdbService {
       const response = await axios.get(
         `${TMDB_BASE_URL}/movie/${movieId}/recommendations`,
         {
-          params: {
-            api_key: TMDB_API_KEY,
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -195,8 +204,8 @@ class TmdbService {
       const response = await axios.get(
         `${TMDB_BASE_URL}/movie/${movieId}/similar`,
         {
-          params: {
-            api_key: TMDB_API_KEY,
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -214,8 +223,8 @@ class TmdbService {
       const response = await axios.get<TmdbCreditsResponse>(
         `${TMDB_BASE_URL}/movie/${movieId}/credits`,
         {
-          params: {
-            api_key: TMDB_API_KEY,
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );
@@ -231,8 +240,8 @@ class TmdbService {
       const response = await axios.get<TmdbReviewsResponse>(
         `${TMDB_BASE_URL}/movie/${movieId}/reviews`,
         {
-          params: {
-            api_key: TMDB_API_KEY,
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
           },
         },
       );

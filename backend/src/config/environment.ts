@@ -8,6 +8,7 @@ export interface EnvironmentVariables {
   USE_LOCAL_DB: boolean;
   JWT_EXPIRES_IN: string;
   TMDB_API_KEY: string;
+  TMDB_BEARER_TOKEN: string;
   TMDB_BASE_URL: string;
   FRONTEND_URL: string;
 }
@@ -29,6 +30,7 @@ export const getEnvironmentVariables = (): EnvironmentVariables => {
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "10d",
     TMDB_API_KEY:
       process.env.TMDB_API_KEY || "a51ddc95c151ce4ad6b063002d584535",
+    TMDB_BEARER_TOKEN: process.env.TMDB_BEARER_TOKEN || "",
     TMDB_BASE_URL: process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3",
     FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
   };
