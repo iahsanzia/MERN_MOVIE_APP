@@ -1,1 +1,36 @@
 import { Request, Response, NextFunction } from "express";
+import { AuthService } from "../services";
+import { AppError } from "../utils";
+import "../types";
+
+export const auth = (req: Request, res: Response, next: NextFunction): void => {
+  try {
+    const token = req.headers.authorization?.split(` `)[1];
+
+    if (!token) {
+      throw new AppError("No Token provided. Authorization required", 401);
+    }
+
+    const decoded = AuthService.verifyToken(token);
+
+    if (!decoded) {
+      throw new AppError("Invalid or expired Token", 401);
+    }
+    req.userId = decoded.userId;
+    req.email = decoded.email;
+
+    next();
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({
+        status: "error",
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        message: "Authentication Error",
+      });
+    }
+  }
+};

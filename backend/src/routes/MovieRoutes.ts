@@ -1,10 +1,9 @@
 import { Router } from "express";
 import { MovieController } from "../controllers";
 import { catchAsync } from "../utils";
+import { auth } from "../middlewares";
 
 const router = Router();
-
-router.post("/", catchAsync(MovieController.createMovie)); // POST /api/movies
 
 router.get("/", catchAsync(MovieController.getAllMovies)); // GET /api/movies
 
@@ -17,6 +16,11 @@ router.get("/director", catchAsync(MovieController.getMoviesByDirector)); // GET
 router.get("/year", catchAsync(MovieController.getMoviesByYear)); // GET /api/movies/year?year=2009
 
 router.get("/filter", catchAsync(MovieController.getFiltered)); // GET /api/movies/filter?genre=action&director=...&minRating=7&maxRating=9&releaseYear=2020
+
+router.use(auth);
+
+router.post("/", catchAsync(MovieController.createMovie)); // POST /api/movies
+
 router.put("/:movieId", catchAsync(MovieController.updateMovie)); // PUT /api/movies/:movieId
 
 router.delete("/:movieId", catchAsync(MovieController.deleteMovie)); // DELETE /api/movies/:movieId

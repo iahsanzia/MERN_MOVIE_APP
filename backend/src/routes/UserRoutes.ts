@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { UserController } from "../controllers";
 import { catchAsync } from "../utils";
+import { auth } from "../middlewares";
 
 const router = Router();
+
+router.use(auth);
 
 router.get("/:id", catchAsync(UserController.getProfile)); // GET /api/users/:id
 

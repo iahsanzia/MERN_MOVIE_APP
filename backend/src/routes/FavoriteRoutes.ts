@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { FavoriteController } from "../controllers";
 import { catchAsync } from "../utils";
+import { auth } from "../middlewares";
 
 const router = Router();
+
+router.use(auth);
 
 router.post("/", catchAsync(FavoriteController.createFavorite)); // POST /api/favorites
 
