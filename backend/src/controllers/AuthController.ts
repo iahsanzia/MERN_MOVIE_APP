@@ -10,9 +10,9 @@ class AuthController {
       throw new AppError("Email,Password and Username are required", 400);
     }
     const { user, token } = await UserService.register(
+      username,
       email,
       password,
-      username,
     );
     res.status(201).json({
       status: "success",
