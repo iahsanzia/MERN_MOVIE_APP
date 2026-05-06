@@ -4,6 +4,11 @@ import { catchAsync } from "../utils";
 
 const router = Router();
 
+router.use((req, _res, next) => {
+  console.log(`TMDB Route: ${req.method} ${req.path}`);
+  next();
+});
+
 router.get("/search", catchAsync(TmdbController.searchMovies));
 
 router.get("/movie/:movieId", catchAsync(TmdbController.getMovieDetails));
@@ -20,13 +25,16 @@ router.get("/genres", catchAsync(TmdbController.getGenres));
 
 router.get(
   "/movie/:movieId/recommendations",
-  TmdbController.getRecommendations,
+  catchAsync(TmdbController.getRecommendations),
 );
 
-router.get("/movie/:movieId/similar", TmdbController.getSimilarMovies);
+router.get(
+  "/movie/:movieId/similar",
+  catchAsync(TmdbController.getSimilarMovies),
+);
 
-router.get("/movie/:movieId/credits", TmdbController.getCredits);
+router.get("/movie/:movieId/credits", catchAsync(TmdbController.getCredits));
 
-router.get("/movie/:movieId/reviews", TmdbController.getReviews);
+router.get("/movie/:movieId/reviews", catchAsync(TmdbController.getReviews));
 
 export default router;

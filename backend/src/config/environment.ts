@@ -27,7 +27,8 @@ export const getEnvironmentVariables = (): EnvironmentVariables => {
     USE_LOCAL_DB: process.env.USE_LOCAL_DB === "true",
     JWT_SECRET: process.env.JWT_SECRET || "",
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "10d",
-    TMDB_API_KEY: process.env.TMDB_API_KEY || "",
+    TMDB_API_KEY:
+      process.env.TMDB_API_KEY || "a51ddc95c151ce4ad6b063002d584535",
     TMDB_BASE_URL: process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3",
     FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
   };

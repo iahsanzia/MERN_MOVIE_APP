@@ -7,13 +7,29 @@ import {
   TmdbSearchResponse,
   TmdbTrendingResponse,
 } from "../types";
+import { getEnvironmentVariables } from "../config/environment";
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
-const TMDB_BASE_URL = process.env.TMDB_BASE_URL;
+const env = getEnvironmentVariables();
+
+const TMDB_API_KEY = env.TMDB_API_KEY;
+const TMDB_BASE_URL = env.TMDB_BASE_URL;
+console.log("Controller loaded11");
+
+// console.log(
+//   "TMDB API Key loaded:",
+//   TMDB_API_KEY ? `Present ${TMDB_API_KEY}` : " Missing",
+// );
 
 class TmdbService {
   async searchMovies(query: string, page: number = 1): Promise<any> {
+    console.log("Request Sent11");
+
     try {
+      console.log("Request Sent");
+      if (!TMDB_API_KEY) {
+        throw new Error("TMDB_API_KEY not configured");
+      }
+      console.log("API CLEARED");
       const response = await axios.get<TmdbSearchResponse>(
         `${TMDB_BASE_URL}/search/movie`,
         {
@@ -24,14 +40,27 @@ class TmdbService {
           },
         },
       );
-
       return {
         status: "success",
         results: response.data.results,
-        totalPages: Math.ceil(response.data.results.length / 20),
+        totalPages: response.data.results.length,
       };
     } catch (error: any) {
-      throw new Error(`TMDB Search Error: ${error.message}`);
+      console.log("======== TMDB ERROR DEBUG ========");
+      console.log("Status:", error.response?.status);
+      console.log("Data:", JSON.stringify(error.response?.data, null, 2));
+      console.log("Params:", {
+        api_key: TMDB_API_KEY,
+        query,
+        page,
+      });
+      console.log("==================================");
+
+      throw new Error(
+        `TMDB Search Error: ${
+          error.response?.data?.status_message || error.message
+        }`,
+      );
     }
   }
 

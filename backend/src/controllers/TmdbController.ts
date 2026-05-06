@@ -1,17 +1,29 @@
 import { Request, Response } from "express";
-import { TmdbService } from "../services";
+
 import { AppError } from "../utils";
+
+// console.log(" TmdbController file loading...");
+
+// try {
+//   const { TmdbService } = require("../services");
+//   console.log(" TmdbService imported:", TmdbService);
+// } catch (error: any) {
+//   console.error(" Error importing TmdbService:", error.message);
+// }
+import { TmdbService } from "../services";
+console.log(`In the controller:`);
+
+// console.log("TmdbService value:", TmdbService);
 
 class TmdbController {
   async searchMovies(req: Request, res: Response): Promise<void> {
+    console.log(`Inside the controller:`);
     const { query, page } = req.query;
-    if (!query) {
+    const pageNumber = page ? Number(page) : 1;
+    if (!query || (query as string).trim() === "") {
       throw new AppError("Search Query is required", 400);
     }
-    const result = await TmdbService.searchMovies(
-      query as string,
-      Number(page),
-    );
+    const result = await TmdbService.searchMovies(query as string, pageNumber);
 
     res.status(200).json({
       status: "success",

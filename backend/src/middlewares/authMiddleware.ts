@@ -1,9 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services";
 import { AppError } from "../utils";
-import "../types";
 
-export const auth = (req: Request, res: Response, next: NextFunction): void => {
+interface AuthRequest extends Request {
+  userId?: string;
+  email?: string;
+}
+
+export const auth = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): void => {
   try {
     const token = req.headers.authorization?.split(` `)[1];
 

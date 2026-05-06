@@ -18,11 +18,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// console.log("tmdbRoutes:", tmdbRoutes);
+
+app.use((req, _res, next) => {
+  console.log(`Incoming: ${req.method} ${req.path}`);
+  next();
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/watched", watchedRoutes);
+
 app.use("/api/tmdb", tmdbRoutes);
 
 app.get("/api/health", (_req, res) => {
