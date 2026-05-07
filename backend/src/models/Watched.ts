@@ -6,7 +6,6 @@ export interface IWatched extends Document {
   summary: string;
   releaseDate: Date;
   genres: string[];
-  director: string;
   cast: string[];
   rating: number;
   WatchedAt: Date;
@@ -22,7 +21,6 @@ const watchedSchema: Schema<IWatched> = new Schema({
   summary: { type: String, required: true },
   releaseDate: { type: Date, required: true },
   genres: { type: [String], default: [] },
-  director: { type: String, required: true },
   cast: { type: [String], default: [] },
   rating: { type: Number, min: 0, max: 10 },
   WatchedAt: { type: Date, default: Date.now },

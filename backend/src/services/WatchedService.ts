@@ -44,14 +44,14 @@ class WatchedService {
     if (!deleted) {
       throw new Error("Watched entry not found");
     }
-    return await WatchedRepository.deleteByUserIdAndMovieId(userId, movieId);
+    return deleted;
   }
   async removeFromWatchedById(watchedId: string): Promise<boolean> {
     const deleted = await WatchedRepository.deleteById(watchedId);
     if (!deleted) {
       throw new Error("Watched entry not found");
     }
-    return await WatchedRepository.deleteById(watchedId);
+    return deleted;
   }
 
   async getWatchedCount(movieId: number): Promise<number> {

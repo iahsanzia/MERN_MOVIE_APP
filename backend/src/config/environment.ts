@@ -1,3 +1,9 @@
+import dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables as early as possible
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+
 export interface EnvironmentVariables {
   NODE_ENV: "development" | "production" | "test";
   PORT: number;

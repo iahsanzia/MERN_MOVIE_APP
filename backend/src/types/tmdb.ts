@@ -36,7 +36,7 @@ export interface TmdbTrendingResponse {
 }
 
 export interface TmdbGenreResponse {
-  genre: Array<{
+  genres: Array<{
     id: number;
     name: string;
   }>;

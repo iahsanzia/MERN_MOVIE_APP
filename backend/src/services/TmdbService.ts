@@ -173,7 +173,7 @@ class TmdbService {
       );
       return {
         status: "success",
-        genres: response.data.genre,
+        genres: response.data.genres,
       };
     } catch (error: any) {
       throw new Error(`TMDB Genres Error: ${error.message}`);

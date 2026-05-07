@@ -44,7 +44,7 @@ class FavoriteService {
     if (!deleted) {
       throw new Error("Favorite not found");
     }
-    return await FavoriteRepository.deleteByUserIdAndMovieId(userId, movieId);
+    return deleted;
   }
 
   async removeFromFavoritesById(favoriteId: string): Promise<boolean> {
@@ -52,7 +52,7 @@ class FavoriteService {
     if (!deleted) {
       throw new Error("Favorite not found");
     }
-    return await FavoriteRepository.deleteById(favoriteId);
+    return deleted;
   }
 
   async getFavoriteCount(movieId: number): Promise<number> {

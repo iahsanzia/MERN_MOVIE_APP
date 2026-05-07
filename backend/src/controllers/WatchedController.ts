@@ -149,7 +149,7 @@ class WatchedController {
   }
 
   async getWatchedCount(req: Request, res: Response): Promise<void> {
-    const { movieId } = req.query;
+    const { movieId } = req.params;
     if (!movieId) {
       throw new AppError("MovieID is required", 400);
     }
