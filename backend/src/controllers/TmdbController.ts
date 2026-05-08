@@ -97,13 +97,37 @@ class TmdbController {
     });
   }
   async getGenres(_req: Request, res: Response): Promise<void> {
-    const genres = await TmdbService.getGenres();
+    console.log("TmdbController: getGenres called");
+    try {
+      const genres = await TmdbService.getGenres();
+      console.log("TmdbController: Genres received from service", genres);
 
-    res.status(200).json({
-      status: "success",
-      message: "Genres recieved",
-      data: genres,
-    });
+      res.status(200).json({
+        status: "success",
+        message: "Genres recieved",
+        data: genres,
+      });
+    } catch (error) {
+      console.error("TmdbController: Error in getGenres", error);
+      throw error;
+    }
+  }
+
+  async getLanguages(_req: Request, res: Response): Promise<void> {
+    console.log("TmdbController: getLanguages called");
+    try {
+      const languages = await TmdbService.getLanguages();
+      console.log("TmdbController: Languages received from service");
+
+      res.status(200).json({
+        status: "success",
+        message: "Languages received",
+        data: languages,
+      });
+    } catch (error) {
+      console.error("TmdbController: Error in getLanguages", error);
+      throw error;
+    }
   }
 
   async getRecommendations(req: Request, res: Response): Promise<void> {

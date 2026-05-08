@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import SignupForm from "./SignupForm";
 import { useSignupForm } from "../hooks/useSignupForm";
 
 function SignupCard() {
+  const navigate = useNavigate();
   const { formData, error, loading, handleChange, handleSubmit } =
-    useSignupForm();
+    useSignupForm(navigate);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red via-black to-gray flex items-center justify-center px-4 py-6">

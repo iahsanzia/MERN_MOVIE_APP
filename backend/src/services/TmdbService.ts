@@ -157,6 +157,13 @@ class TmdbService {
 
   async getGenres(): Promise<any> {
     try {
+      console.log("TmdbService: Getting genres...");
+      console.log("TMDB_BASE_URL:", process.env.TMDB_BASE_URL);
+      console.log(
+        "TMDB_BEARER_TOKEN present:",
+        !!process.env.TMDB_BEARER_TOKEN,
+      );
+
       const response = await axios.get<TmdbGenreResponse>(
         `${TMDB_BASE_URL}/genre/movie/list`,
         {
@@ -165,12 +172,40 @@ class TmdbService {
           },
         },
       );
+
+      console.log("TmdbService: Genres fetched successfully");
       return {
         status: "success",
         genres: response.data.genres,
       };
     } catch (error: any) {
+      console.error("TmdbService: Error fetching genres:", error.message);
+      console.error("Error details:", error.response?.data || error);
       throw new Error(`TMDB Genres Error: ${error.message}`);
+    }
+  }
+
+  async getLanguages(): Promise<any> {
+    try {
+      console.log("TmdbService: Getting languages...");
+      const response = await axios.get(
+        `${TMDB_BASE_URL}/configuration/languages`,
+        {
+          headers: {
+            Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
+          },
+        },
+      );
+
+      console.log("TmdbService: Languages fetched successfully");
+      return {
+        status: "success",
+        languages: response.data,
+      };
+    } catch (error: any) {
+      console.error("TmdbService: Error fetching languages:", error.message);
+      console.error("Error details:", error.response?.data || error);
+      throw new Error(`TMDB Languages Error: ${error.message}`);
     }
   }
 

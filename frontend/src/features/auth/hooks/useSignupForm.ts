@@ -1,8 +1,11 @@
 import { useState, ChangeEvent, FormEvent } from "react";
+import { NavigateFunction } from "react-router-dom";
 import { SignupFormData } from "../types/SignupFormData";
 import { signupUser } from "../services/authService";
+import { useAuth } from "../../../context/AuthContext";
 
-export function useSignupForm() {
+export function useSignupForm(navigate: NavigateFunction) {
+  const { setAuth } = useAuth();
   const [formData, setFormData] = useState<SignupFormData>({
     username: "",
     email: "",
@@ -27,7 +30,15 @@ export function useSignupForm() {
       }
 
       const response = await signupUser(formData);
-      console.log("Signup successful:", response);
+
+      // Extract user and token from response
+      const { user, token } = response.data;
+
+      // Store user and token in auth context
+      setAuth(user, token);
+
+      // Navigate to preferences screen
+      navigate("/preferences");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {

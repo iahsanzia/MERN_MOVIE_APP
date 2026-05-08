@@ -23,6 +23,8 @@ router.get("/by-genre", catchAsync(TmdbController.getMoviesByGenre));
 
 router.get("/genres", catchAsync(TmdbController.getGenres));
 
+router.get("/languages", catchAsync(TmdbController.getLanguages));
+
 router.get(
   "/movie/:movieId/recommendations",
   catchAsync(TmdbController.getRecommendations),

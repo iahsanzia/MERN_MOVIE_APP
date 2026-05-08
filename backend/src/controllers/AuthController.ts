@@ -14,6 +14,7 @@ class AuthController {
       email,
       password,
     );
+
     res.status(201).json({
       status: "success",
       message: "User registered successfully",
@@ -35,6 +36,7 @@ class AuthController {
     }
 
     const { user, token } = await UserService.login(email, password);
+
     res.status(200).json({
       status: "success",
       message: "User logged in successfully",
@@ -63,6 +65,44 @@ class AuthController {
       status: "success",
       message: "Token is valid",
       data: { userId: decoded.userId },
+    });
+  }
+
+  async verify(req: Request, res: Response): Promise<void> {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      throw new AppError("Not authenticated", 401);
+    }
+
+    const decoded = AuthService.verifyToken(token);
+    if (!decoded) {
+      throw new AppError("Invalid or expired token", 401);
+    }
+
+    // Fetch user details
+    const user = await UserService.getUserById(decoded.userId);
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "User authenticated",
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          username: user.username,
+        },
+      },
+    });
+  }
+
+  async logout(_req: Request, res: Response): Promise<void> {
+    res.status(200).json({
+      status: "success",
+      message: "Logged out successfully",
     });
   }
 }

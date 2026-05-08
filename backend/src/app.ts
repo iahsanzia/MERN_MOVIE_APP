@@ -12,10 +12,17 @@ import {
 } from "./routes";
 
 import { errorHandler, notFoundHandler } from "./middlewares";
+import { getEnvironmentVariables } from "./config/environment";
 
 const app = express();
+const env = getEnvironmentVariables();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: env.FRONTEND_URL,
+  }),
+);
+
 app.use(express.json());
 
 // console.log("tmdbRoutes:", tmdbRoutes);
