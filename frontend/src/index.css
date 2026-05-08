@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Input field styling */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  background-color: #374151 !important;
+  color: white !important;
+  caret-color: white;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Override autofill styling */
+input[type="text"]:-webkit-autofill,
+input[type="email"]:-webkit-autofill,
+input[type="password"]:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #374151 inset !important;
+  -webkit-text-fill-color: white !important;
+}
+
+input[type="text"]:-webkit-autofill::first-line,
+input[type="email"]:-webkit-autofill::first-line,
+input[type="password"]:-webkit-autofill::first-line {
+  color: white !important;
+}
