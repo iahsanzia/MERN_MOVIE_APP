@@ -13,12 +13,6 @@ const env = getEnvironmentVariables();
 
 const TMDB_BEARER_TOKEN = env.TMDB_BEARER_TOKEN;
 const TMDB_BASE_URL = env.TMDB_BASE_URL;
-console.log("Controller loaded11");
-
-// console.log(
-//   "TMDB API Key loaded:",
-//   TMDB_API_KEY ? `Present ${TMDB_API_KEY}` : " Missing",
-// );
 
 class TmdbService {
   async searchMovies(query: string, page: number = 1): Promise<any> {
