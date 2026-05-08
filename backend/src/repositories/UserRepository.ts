@@ -13,14 +13,10 @@ class UserRepository {
     try {
       // Check if id is a valid MongoDB ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        console.log("Invalid ObjectId:", id);
         return null;
       }
-      const user = await User.findById(id);
-      console.log("findById result for", id, ":", user ? "found" : "not found");
-      return user;
+      return await User.findById(id);
     } catch (error) {
-      console.log("findById error:", error);
       return null;
     }
   }
@@ -31,18 +27,17 @@ class UserRepository {
     return await User.findOne({ username });
   }
   async update(id: string, updateData: Partial<IUser>): Promise<IUser | null> {
-    console.log("update() called with id:", id, "updateData:", updateData);
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log("Invalid ObjectId in update");
+    try {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return null;
+      }
+      return await User.findByIdAndUpdate(id, updateData, {
+        new: true,
+        returnDocument: "after",
+      });
+    } catch (error) {
       return null;
     }
-    console.log("Calling findByIdAndUpdate...");
-    const result = await User.findByIdAndUpdate(id, updateData, { new: true });
-    console.log(
-      "findByIdAndUpdate result:",
-      result ? "got result" : "null/undefined",
-    );
-    return result;
   }
   async delete(id: string): Promise<boolean> {
     try {

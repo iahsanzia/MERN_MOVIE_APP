@@ -98,9 +98,7 @@ class UserService {
     email?: string,
     password?: string,
   ): Promise<IUser | null> {
-    console.log("updateProfile called with userId:", userId);
     const user = await UserRepository.findById(userId);
-    console.log("findById returned:", user ? "user found" : "user not found");
     if (!user) {
       throw new Error("User not found.");
     }
