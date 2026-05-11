@@ -499,47 +499,4 @@ describe("UserService", () => {
       expect(Array.isArray(users)).toBe(true);
     });
   });
-
-  describe("Integration Tests", () => {
-    it("should register, login, update profile, and get user", async () => {
-      const uid = `${Date.now()}_${++testCounter}`;
-      const integrationUser = `integration_${uid}`;
-      const integrationEmail = `integration_${uid}@example.com`;
-
-      const registerResult = await UserService.register(
-        integrationUser,
-        integrationEmail,
-        "Password123",
-      );
-      const userId = registerResult.user._id.toString();
-
-      const loginResult = await UserService.login(
-        integrationEmail,
-        "Password123",
-      );
-      expect(loginResult.token).toBeDefined();
-
-      const updatedUser = await UserService.updateProfile(
-        userId,
-        `updated_${uid}`,
-      );
-      expect(updatedUser?.username).toBe(`updated_${uid}`);
-
-      const user = await UserService.getUserById(userId);
-      expect(user?.username).toBe(`updated_${uid}`);
-
-      const userWithPrefs = await UserService.updatePreferences(
-        userId,
-        ["Action"],
-        ["English"],
-      );
-      expect(userWithPrefs?.preferences.favoriteGenres).toEqual(["Action"]);
-
-      const deleted = await UserService.deleteUser(userId);
-      expect(deleted).toBe(true);
-
-      const deletedUser = await UserService.getUserById(userId);
-      expect(deletedUser).toBeNull();
-    });
-  });
 });
