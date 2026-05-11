@@ -1,13 +1,12 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { SignupFormData } from "../types/SignupFormData";
-import { signupUser } from "../services/authService";
+import { LoginFormData } from "../types/LoginFormData";
+import { loginUser } from "../services/authService";
 import { useAuth } from "../../../context/AuthContext";
 
-export function useSignupForm(navigate: NavigateFunction) {
+export function useLoginForm(navigate: NavigateFunction) {
   const { setAuth } = useAuth();
-  const [formData, setFormData] = useState<SignupFormData>({
-    username: "",
+  const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
@@ -25,26 +24,27 @@ export function useSignupForm(navigate: NavigateFunction) {
     setLoading(true);
 
     try {
+      if (!formData.email.trim()) {
+        throw new Error("Email or username is required");
+      }
+
       if (formData.password.length < 6) {
         throw new Error("Password must be at least 6 characters");
       }
 
-      console.log("📝 Signup: Sending signup request...");
-      const response = await signupUser(formData);
-      console.log("✅ Signup: Response received", response.data);
+      // Backend accepts email or username in the email field
+      const response = await loginUser(formData.email, formData.password);
 
       // Extract user and token from response
       const { user, token } = response.data;
 
       // Store user and token in auth context
-      console.log("🔐 Signup: Setting auth context with user:", user.username);
       setAuth(user, token);
 
-      // Navigate to preferences screen
-      console.log("➡️ Signup: Navigating to /preferences");
-      navigate("/preferences");
+      // Navigate to home page
+      navigate("/home");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed");
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }

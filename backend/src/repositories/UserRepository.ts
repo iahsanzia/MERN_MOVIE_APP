@@ -7,6 +7,7 @@ class UserRepository {
     return await user.save();
   }
   async findByEmail(email: string): Promise<IUser | null> {
+    // Email is already stored in lowercase in schema with lowercase: true
     return await User.findOne({ email });
   }
   async findById(id: string): Promise<IUser | null> {
@@ -37,7 +38,10 @@ class UserRepository {
       return null;
     }
     console.log("Calling findByIdAndUpdate...");
-    const result = await User.findByIdAndUpdate(id, updateData, { new: true });
+    const result = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
     console.log(
       "findByIdAndUpdate result:",
       result ? "got result" : "null/undefined",

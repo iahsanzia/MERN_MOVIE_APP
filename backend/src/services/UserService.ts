@@ -77,19 +77,35 @@ class UserService {
     favoriteGenres: string[],
     languages: string[],
   ): Promise<IUser | null> {
+    console.log(
+      "updatePreferences called with userId:",
+      userId,
+      "type:",
+      typeof userId,
+    );
     const user = await UserRepository.findById(userId);
+    console.log("User found:", user ? "yes" : "no");
     if (!user) {
       throw new Error("User not found.");
     }
 
     const updatedData: Partial<IUser> = {
       preferences: {
-        favoriteGenres: favoriteGenres || user.preferences.favoriteGenres,
-        languages: languages || user.preferences.languages,
+        favoriteGenres:
+          favoriteGenres !== undefined
+            ? favoriteGenres
+            : user.preferences.favoriteGenres,
+        languages:
+          languages !== undefined ? languages : user.preferences.languages,
       },
     };
 
-    return await UserRepository.update(userId, updatedData);
+    const result = await UserRepository.update(userId, updatedData);
+    console.log(
+      "updatePreferences result:",
+      result ? "got updated user" : "null/undefined",
+    );
+    return result;
   }
 
   async updateProfile(

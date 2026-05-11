@@ -4,6 +4,7 @@ import dns from "node:dns";
 import path from "node:path";
 import { beforeAll, afterAll } from "@jest/globals";
 import { getEnvironmentVariables } from "../config/environment";
+import { User, Movie } from "../models";
 
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
@@ -23,8 +24,8 @@ beforeAll(async () => {
   });
   console.log("MongoDB connected successfully");
 
-  // Clear database ONCE before all tests start
-  await clearAllCollections();
+  // Create indexes after connection
+  await createIndexes();
 });
 
 afterAll(async () => {
@@ -33,6 +34,31 @@ afterAll(async () => {
   await mongoose.disconnect();
 });
 
+async function createIndexes() {
+  try {
+    // Create unique indexes for User
+    await User.collection.createIndex(
+      { email: 1 },
+      { unique: true, sparse: false },
+    );
+    await User.collection.createIndex(
+      { username: 1 },
+      { unique: true, sparse: false },
+    );
+
+    // Create index for Movie movieId
+    await Movie.collection.createIndex(
+      { movieId: 1 },
+      { unique: true, sparse: false },
+    );
+  } catch (error) {
+    console.log(
+      "Index creation note:",
+      error instanceof Error ? error.message : error,
+    );
+  }
+}
+
 async function clearAllCollections() {
   try {
     const db = mongoose.connection.getClient().db(mongoose.connection.name);
@@ -40,32 +66,26 @@ async function clearAllCollections() {
     // Get all collections
     const collections = await db.listCollections().toArray();
 
-    // Drop each collection
+    // Delete documents from each collection (don't drop, which would remove indexes)
     for (const collectionInfo of collections) {
       const collectionName = collectionInfo.name;
 
       // Skip system collections
       if (!collectionName.startsWith("system.")) {
         try {
-          await db.dropCollection(collectionName);
-          console.log(
-            `[Startup Cleanup] Dropped collection: ${collectionName}`,
-          );
+          const collection = db.collection(collectionName);
+          await collection.deleteMany({});
+          console.log(`[Cleanup] Cleared collection: ${collectionName}`);
         } catch (error: any) {
-          // Collection might not exist, that's okay
-          if (error.code !== 26) {
-            console.error(
-              `Error dropping collection ${collectionName}:`,
-              error,
-            );
-          }
+          console.error(`Error clearing collection ${collectionName}:`, error);
         }
       }
     }
 
+    // Don't recreate indexes - they're preserved by deleteMany
+    // Mongoose enforces unique constraints from schema definitions
     await new Promise((resolve) => setTimeout(resolve, 100));
   } catch (error) {
     console.error("Error in database cleanup:", error);
-    throw error;
   }
 }

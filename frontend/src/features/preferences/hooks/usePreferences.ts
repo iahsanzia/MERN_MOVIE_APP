@@ -118,7 +118,7 @@ export function usePreferences() {
       // Token is in HttpOnly cookie, credentials: 'include' handles it
       await updatePreferences(user.id, preferences);
       // On success, redirect to home
-      navigate("/");
+      navigate("/home");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to save preferences",
@@ -131,7 +131,7 @@ export function usePreferences() {
 
   const handleSkip = () => {
     // Skip without saving - just navigate home
-    navigate("/");
+    navigate("/home");
   };
 
   return {

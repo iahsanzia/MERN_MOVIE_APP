@@ -1,31 +1,18 @@
 import { UserService } from "../../services";
-import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
-import mongoose from "mongoose";
+import { describe, it, expect, beforeEach } from "@jest/globals";
 import "../setup";
+
+let testCounter = 0;
 
 describe("UserService", () => {
   const timestamp = Date.now();
 
-  afterEach(async () => {
-    try {
-      const collections = mongoose.connection.collections;
-      for (const key in collections) {
-        const collection = collections[key];
-        if (collection) {
-          await collection.deleteMany({});
-        }
-      }
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    } catch (error) {
-      console.error(`Cleanup error:`, error);
-    }
-  });
-
   describe("register", () => {
     it("should register a new user successfully", async () => {
+      const uid = `${timestamp}_${++testCounter}`;
       const result = await UserService.register(
-        `user1_${timestamp}`,
-        `user1_${timestamp}@example.com`,
+        `user1_${uid}`,
+        `user1_${uid}@example.com`,
         "Password123",
       );
 
@@ -44,51 +31,51 @@ describe("UserService", () => {
     });
 
     it("should throw error if password is too short", async () => {
+      const uid = `${timestamp}_${++testCounter}`;
       await expect(
         UserService.register(
           "testuser",
-          `test_short_${timestamp}@example.com`,
+          `test_short_${uid}@example.com`,
           "123",
         ),
       ).rejects.toThrow("Password must be at least 6 characters long.");
     });
 
     it("should throw error if email already exists", async () => {
-      const email = `duplicate_test_${timestamp}@example.com`;
+      const uid = `${timestamp}_${++testCounter}`;
+      const email = `duplicate_test_${uid}@example.com`;
 
-      // Register first user
-      await UserService.register(`user1_${timestamp}`, email, "Password123");
+      await UserService.register(`user1_${uid}`, email, "Password123");
 
-      // Try to register second user with same email - should fail
       await expect(
-        UserService.register(`user2_${timestamp}`, email, "Password123"),
+        UserService.register(`user2b_${uid}`, email, "Password123"),
       ).rejects.toThrow("Email already in use.");
     });
 
     it("should throw error if username already exists", async () => {
-      const username = `duplicate_user_${timestamp}`;
+      const uid = `${timestamp}_${++testCounter}`;
+      const username = `duplicate_user_${uid}`;
 
-      // Register first user
       await UserService.register(
         username,
-        `email1_${timestamp}@example.com`,
+        `email1_${uid}@example.com`,
         "Password123",
       );
 
-      // Try to register second user with same username - should fail
       await expect(
         UserService.register(
           username,
-          `email2_${timestamp}@example.com`,
+          `email2_${uid}@example.com`,
           "Password123",
         ),
       ).rejects.toThrow("Username already in use.");
     });
 
     it("should hash password before saving", async () => {
+      const uid = `${timestamp}_${++testCounter}`;
       const result = await UserService.register(
-        `user_hash_${timestamp}`,
-        `hash_${timestamp}@example.com`,
+        `user_hash_${uid}`,
+        `hash_${uid}@example.com`,
         "Password123",
       );
 
@@ -97,9 +84,10 @@ describe("UserService", () => {
     });
 
     it("should generate JWT token", async () => {
+      const uid = `${timestamp}_${++testCounter}`;
       const result = await UserService.register(
-        `user_jwt_${timestamp}`,
-        `jwt_${timestamp}@example.com`,
+        `user_jwt_${uid}`,
+        `jwt_${uid}@example.com`,
         "Password123",
       );
 
@@ -109,9 +97,10 @@ describe("UserService", () => {
     });
 
     it("should accept password with exactly 6 characters", async () => {
+      const uid = `${timestamp}_${++testCounter}`;
       const result = await UserService.register(
-        `user_6char_${timestamp}`,
-        `6char_${timestamp}@example.com`,
+        `user_6char_${uid}`,
+        `6char_${uid}@example.com`,
         "123456",
       );
 
@@ -121,45 +110,51 @@ describe("UserService", () => {
   });
 
   describe("login", () => {
+    let timestamp: number;
+
     beforeEach(async () => {
+      timestamp = Date.now();
+      const uid = `${timestamp}_${++testCounter}`;
       await UserService.register(
-        `login_user_${timestamp}`,
-        `login_${timestamp}@example.com`,
+        `login_user_${uid}`,
+        `login_${uid}@example.com`,
         "Password123",
       );
+      (this as any).uid = uid;
     });
 
     it("should login user successfully", async () => {
+      const uid = (this as any).uid;
       const result = await UserService.login(
-        `login_${timestamp}@example.com`,
+        `login_${uid}@example.com`,
         "Password123",
       );
 
       expect(result).toBeDefined();
       expect(result.user).toBeDefined();
       expect(result.token).toBeDefined();
-      expect(result.user.email).toBe(`login_${timestamp}@example.com`);
-      expect(result.user.username).toBe(`login_user_${timestamp}`);
+      expect(result.user.email).toBe(`login_${uid}@example.com`);
+      expect(result.user.username).toBe(`login_user_${uid}`);
     });
 
     it("should throw error if email does not exist", async () => {
+      const uid = `${Date.now()}_${++testCounter}`;
       await expect(
-        UserService.login(
-          `nonexistent_${timestamp}@example.com`,
-          "Password123",
-        ),
+        UserService.login(`nonexistent_${uid}@example.com`, "Password123"),
       ).rejects.toThrow("Invalid email or password.");
     });
 
     it("should throw error if password is incorrect", async () => {
+      const uid = (this as any).uid;
       await expect(
-        UserService.login(`login_${timestamp}@example.com`, "WrongPassword123"),
+        UserService.login(`login_${uid}@example.com`, "WrongPassword123"),
       ).rejects.toThrow("Invalid email or password.");
     });
 
     it("should generate JWT token on login", async () => {
+      const uid = (this as any).uid;
       const result = await UserService.login(
-        `login_${timestamp}@example.com`,
+        `login_${uid}@example.com`,
         "Password123",
       );
 
@@ -169,14 +164,15 @@ describe("UserService", () => {
     });
 
     it("should return correct user data on login", async () => {
+      const uid = (this as any).uid;
       const result = await UserService.login(
-        `login_${timestamp}@example.com`,
+        `login_${uid}@example.com`,
         "Password123",
       );
 
       expect(result.user._id).toBeDefined();
-      expect(result.user.email).toBe(`login_${timestamp}@example.com`);
-      expect(result.user.username).toBe(`login_user_${timestamp}`);
+      expect(result.user.email).toBe(`login_${uid}@example.com`);
+      expect(result.user.username).toBe(`login_user_${uid}`);
       expect(result.user.preferences).toBeDefined();
     });
   });
@@ -185,9 +181,10 @@ describe("UserService", () => {
     let userId: string;
 
     beforeEach(async () => {
+      const uid = `${Date.now()}_${++testCounter}`;
       const result = await UserService.register(
-        `user_getbyid_${timestamp}`,
-        `getbyid_${timestamp}@example.com`,
+        `user_getbyid_${uid}`,
+        `getbyid_${uid}@example.com`,
         "Password123",
       );
       userId = result.user._id.toString();
@@ -221,9 +218,10 @@ describe("UserService", () => {
     let userId: string;
 
     beforeEach(async () => {
+      const uid = `${Date.now()}_${++testCounter}`;
       const result = await UserService.register(
-        `user_prefs_${timestamp}`,
-        `prefs_${timestamp}@example.com`,
+        `user_prefs_${uid}`,
+        `prefs_${uid}@example.com`,
         "Password123",
       );
       userId = result.user._id.toString();
@@ -310,11 +308,13 @@ describe("UserService", () => {
 
   describe("updateProfile", () => {
     let userId: string;
+    let uid: string;
 
     beforeEach(async () => {
+      uid = `${Date.now()}_${++testCounter}`;
       const result = await UserService.register(
-        `user_update_${timestamp}`,
-        `update_${timestamp}@example.com`,
+        `user_update_${uid}`,
+        `update_${uid}@example.com`,
         "Password123",
       );
       userId = result.user._id.toString();
@@ -323,14 +323,14 @@ describe("UserService", () => {
     it("should update username successfully", async () => {
       const updatedUser = await UserService.updateProfile(
         userId,
-        `newusername_${timestamp}`,
+        `newusername_${uid}`,
       );
 
-      expect(updatedUser?.username).toBe(`newusername_${timestamp}`);
+      expect(updatedUser?.username).toBe(`newusername_${uid}`);
     });
 
     it("should update email successfully", async () => {
-      const newEmail = `newemail_${timestamp}@example.com`;
+      const newEmail = `newemail_${uid}@example.com`;
       const updatedUser = await UserService.updateProfile(
         userId,
         undefined,
@@ -352,24 +352,23 @@ describe("UserService", () => {
 
       expect(updatedUser?.password).not.toBe(newPassword);
 
-      // Verify new password works for login
       const loginResult = await UserService.login(
-        `update_${timestamp}@example.com`,
+        `update_${uid}@example.com`,
         newPassword,
       );
       expect(loginResult).toBeDefined();
     });
 
     it("should update multiple fields at once", async () => {
-      const newEmail = `multi_${timestamp}@example.com`;
+      const newEmail = `multi_${uid}@example.com`;
       const updatedUser = await UserService.updateProfile(
         userId,
-        `newusername_multi_${timestamp}`,
+        `newusername_multi_${uid}`,
         newEmail,
         "NewPassword123",
       );
 
-      expect(updatedUser?.username).toBe(`newusername_multi_${timestamp}`);
+      expect(updatedUser?.username).toBe(`newusername_multi_${uid}`);
       expect(updatedUser?.email).toBe(newEmail);
       expect(updatedUser?.password).not.toBe("NewPassword123");
     });
@@ -383,39 +382,37 @@ describe("UserService", () => {
     });
 
     it("should throw error if email already in use", async () => {
-      const otherEmail = `other_${timestamp}@example.com`;
+      const otherUid = `${Date.now()}_${++testCounter}`;
+      const otherEmail = `other_${otherUid}@example.com`;
 
-      // Register another user
       await UserService.register(
-        `other_user_${timestamp}`,
+        `other_user_${otherUid}`,
         otherEmail,
         "Password123",
       );
 
-      // Try to update first user's email to second user's email
       await expect(
         UserService.updateProfile(userId, undefined, otherEmail),
       ).rejects.toThrow("Email already in use.");
     });
 
     it("should throw error if username already in use", async () => {
-      const otherUsername = `other_user_${timestamp}`;
+      const otherUid = `${Date.now()}_${++testCounter}`;
+      const otherUsername = `other_user_${otherUid}`;
 
-      // Register another user
       await UserService.register(
         otherUsername,
-        `other_email_${timestamp}@example.com`,
+        `other_email_${otherUid}@example.com`,
         "Password123",
       );
 
-      // Try to update first user's username to second user's username
       await expect(
         UserService.updateProfile(userId, otherUsername),
       ).rejects.toThrow("Username already in use.");
     });
 
     it("should allow same email update", async () => {
-      const currentEmail = `update_${timestamp}@example.com`;
+      const currentEmail = `update_${uid}@example.com`;
       const updatedUser = await UserService.updateProfile(
         userId,
         undefined,
@@ -426,7 +423,7 @@ describe("UserService", () => {
     });
 
     it("should allow same username update", async () => {
-      const currentUsername = `user_update_${timestamp}`;
+      const currentUsername = `user_update_${uid}`;
       const updatedUser = await UserService.updateProfile(
         userId,
         currentUsername,
@@ -438,8 +435,8 @@ describe("UserService", () => {
     it("should not update fields if not provided", async () => {
       const updatedUser = await UserService.updateProfile(userId);
 
-      expect(updatedUser?.username).toBe(`user_update_${timestamp}`);
-      expect(updatedUser?.email).toBe(`update_${timestamp}@example.com`);
+      expect(updatedUser?.username).toBe(`user_update_${uid}`);
+      expect(updatedUser?.email).toBe(`update_${uid}@example.com`);
     });
   });
 
@@ -447,9 +444,10 @@ describe("UserService", () => {
     let userId: string;
 
     beforeEach(async () => {
+      const uid = `${Date.now()}_${++testCounter}`;
       const result = await UserService.register(
-        `user_delete_${timestamp}`,
-        `delete_${timestamp}@example.com`,
+        `user_delete_${uid}`,
+        `delete_${uid}@example.com`,
         "Password123",
       );
       userId = result.user._id.toString();
@@ -460,7 +458,6 @@ describe("UserService", () => {
 
       expect(result).toBe(true);
 
-      // Verify user is deleted
       const user = await UserService.getUserById(userId);
       expect(user).toBeNull();
     });
@@ -476,14 +473,17 @@ describe("UserService", () => {
 
   describe("getAllUsers", () => {
     it("should get all users", async () => {
+      const uid1 = `${Date.now()}_${++testCounter}`;
+      const uid2 = `${Date.now()}_${++testCounter}`;
+
       await UserService.register(
-        `user_all_1_${timestamp}`,
-        `all_1_${timestamp}@example.com`,
+        `user_all_1_${uid1}`,
+        `all_1_${uid1}@example.com`,
         "Password123",
       );
       await UserService.register(
-        `user_all_2_${timestamp}`,
-        `all_2_${timestamp}@example.com`,
+        `user_all_2_${uid2}`,
+        `all_2_${uid2}@example.com`,
         "Password123",
       );
 
@@ -502,10 +502,10 @@ describe("UserService", () => {
 
   describe("Integration Tests", () => {
     it("should register, login, update profile, and get user", async () => {
-      const integrationUser = `integration_${timestamp}`;
-      const integrationEmail = `integration_${timestamp}@example.com`;
+      const uid = `${Date.now()}_${++testCounter}`;
+      const integrationUser = `integration_${uid}`;
+      const integrationEmail = `integration_${uid}@example.com`;
 
-      // Register
       const registerResult = await UserService.register(
         integrationUser,
         integrationEmail,
@@ -513,25 +513,21 @@ describe("UserService", () => {
       );
       const userId = registerResult.user._id.toString();
 
-      // Login
       const loginResult = await UserService.login(
         integrationEmail,
         "Password123",
       );
       expect(loginResult.token).toBeDefined();
 
-      // Update profile
       const updatedUser = await UserService.updateProfile(
         userId,
-        `updated_${timestamp}`,
+        `updated_${uid}`,
       );
-      expect(updatedUser?.username).toBe(`updated_${timestamp}`);
+      expect(updatedUser?.username).toBe(`updated_${uid}`);
 
-      // Get user
       const user = await UserService.getUserById(userId);
-      expect(user?.username).toBe(`updated_${timestamp}`);
+      expect(user?.username).toBe(`updated_${uid}`);
 
-      // Update preferences
       const userWithPrefs = await UserService.updatePreferences(
         userId,
         ["Action"],
@@ -539,11 +535,9 @@ describe("UserService", () => {
       );
       expect(userWithPrefs?.preferences.favoriteGenres).toEqual(["Action"]);
 
-      // Delete user
       const deleted = await UserService.deleteUser(userId);
       expect(deleted).toBe(true);
 
-      // Verify deleted
       const deletedUser = await UserService.getUserById(userId);
       expect(deletedUser).toBeNull();
     });

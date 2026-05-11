@@ -47,15 +47,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleSetAuth = (newUser: User, authToken: string) => {
-    console.log("Setting auth - User:", newUser);
+    console.log("🔐 AuthProvider: Setting auth - User:", newUser);
     console.log(
-      "Setting auth - Token:",
+      "🔐 AuthProvider: Setting auth - Token:",
       authToken ? `${authToken.substring(0, 20)}...` : "NO TOKEN",
     );
     setUser(newUser);
     setToken(authToken);
     localStorage.setItem("authToken", authToken);
-    console.log("Token stored in localStorage");
+    console.log("🔐 AuthProvider: Token stored in localStorage");
   };
 
   const handleLogout = () => {
