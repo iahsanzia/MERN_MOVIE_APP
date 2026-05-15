@@ -17,9 +17,6 @@ export const Home: React.FC = () => {
   const { addToFavorite, removeFromFavorite, addToWatched, removeFromWatched } =
     useMovieActions(user?.id);
   const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
-  console.log("trending:", trending);
-  console.log("topRated:", topRated);
-  console.log("loading:", loading);
 
   const handleMovieClick = async (movie: Movie) => {
     try {
@@ -66,14 +63,32 @@ export const Home: React.FC = () => {
   const watchedIds = watched.map((w) => w.movieId.toString());
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="relative h-96 bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center px-4">
-        <h1 className="text-5xl font-bold text-white mb-8 text-center">
+    <div
+      className="min-h-screen"
+      style={{
+        background:
+          "linear-gradient(to bottom, #8B0000 0%, #4a0000 15%, #1a0000 35%, #0d0000 55%, #000000 75%)",
+      }}
+    >
+      {/* Hero Section */}
+      <div className="relative min-h-[320px] py-16 flex flex-col items-center justify-center px-4">
+        {/* Red glow at top */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at top, #e50914 0%, transparent 65%)",
+          }}
+        />
+        <h1 className="relative text-5xl font-bold text-white mb-8 text-center drop-shadow-lg">
           Discover Movies
         </h1>
-        <SearchBox />
+        <div className="relative w-full max-w-md">
+          <SearchBox />
+        </div>
       </div>
 
+      {/* Carousels */}
       <div className="px-4 pb-16">
         <MovieCarousel
           title="Trending Now"
