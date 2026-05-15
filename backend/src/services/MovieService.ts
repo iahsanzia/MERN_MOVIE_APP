@@ -18,6 +18,10 @@ class MovieService {
     return await MovieRepository.findByMovieId(movieId);
   }
 
+  async getMoviesByUserId(userId: string): Promise<IMovie[]> {
+    return await MovieRepository.findByUserId(userId);
+  }
+
   async getAllMovies(): Promise<IMovie[]> {
     return await MovieRepository.findAll();
   }

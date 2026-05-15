@@ -2,10 +2,15 @@ import { Movie, MovieDetails } from "../features/movies/types/index";
 import { Favorite, Watched } from "../features/movies/types/index";
 
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+  `${process.env.REACT_APP_API_URL}/api` || "http://localhost:5000/api";
 
 const getAuthToken = () => {
-  return localStorage.getItem("authToken");
+  const token = localStorage.getItem("authToken");
+  console.log(
+    "[movieService] Auth token from localStorage:",
+    token ? "✓ Found" : "✗ Missing",
+  );
+  return token;
 };
 
 const getHeaders = () => ({
@@ -14,9 +19,63 @@ const getHeaders = () => ({
 });
 
 export const movieService = {
+  async createMovie(movieData: {
+    movieId: number | string;
+    title: string;
+    summary: string;
+    releaseDate: string;
+    posterPath: string;
+    genres: string[];
+    director: string;
+    cast: string[];
+    rating: number;
+  }): Promise<{ _id: string; movieId: string | number }> {
+    const response = await fetch(`${API_BASE_URL}/movies`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        ...movieData,
+        movieId: movieData.movieId.toString(),
+      }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to create movie");
+    }
+    return response.json().then((data) => data.data);
+  },
+
+  async getAllMovies(): Promise<Movie[]> {
+    const response = await fetch(`${API_BASE_URL}/movies`);
+    if (!response.ok) throw new Error("Failed to fetch movies");
+    const data = await response.json();
+    return data.data || [];
+  },
+
+  async getUserSearchedMovies(userId: string): Promise<Movie[]> {
+    console.log(
+      "[movieService] Fetching user searched movies for userId:",
+      userId,
+    );
+    const headers = getHeaders();
+    console.log("[movieService] Auth header present:", !!headers.Authorization);
+    const response = await fetch(`${API_BASE_URL}/movies/user/searched`, {
+      headers,
+    });
+    if (!response.ok) {
+      console.error(
+        "[movieService] Failed to fetch user movies, status:",
+        response.status,
+      );
+      throw new Error("Failed to fetch user movies");
+    }
+    const data = await response.json();
+    return data.data || [];
+  },
+
   async searchMovies(query: string): Promise<Movie[]> {
     const response = await fetch(
-      `${API_BASE_URL}/api/tmdb/search?query=${encodeURIComponent(query)}`,
+      `${API_BASE_URL}/tmdb/search?query=${encodeURIComponent(query)}`,
     );
     if (!response.ok) throw new Error("Failed to search movies");
     const data = await response.json();
@@ -24,7 +83,7 @@ export const movieService = {
   },
 
   async getTrendingMovies(): Promise<Movie[]> {
-    const response = await fetch(`${API_BASE_URL}/api/tmdb/trending`);
+    const response = await fetch(`${API_BASE_URL}/tmdb/trending`);
     if (!response.ok) throw new Error("Failed to fetch trending movies");
     const data = await response.json();
     console.log("RAW trending response:", data);
@@ -32,14 +91,14 @@ export const movieService = {
   },
 
   async getTopRatedMovies(): Promise<Movie[]> {
-    const response = await fetch(`${API_BASE_URL}/api/tmdb/top-rated?page=1`);
+    const response = await fetch(`${API_BASE_URL}/tmdb/top-rated?page=1`);
     if (!response.ok) throw new Error("Failed to fetch top-rated movies");
     const data = await response.json();
     return data.data.results || [];
   },
 
   async getMovieDetails(movieId: number): Promise<MovieDetails> {
-    const response = await fetch(`${API_BASE_URL}/api/tmdb/movie/${movieId}`);
+    const response = await fetch(`${API_BASE_URL}/tmdb/movie/${movieId}`);
     if (!response.ok) throw new Error("Failed to fetch movie details");
     const data = await response.json();
     console.log(`RAW details response for movieId ${movieId}:`, data);
@@ -57,7 +116,7 @@ export const movieService = {
       summary: string;
     },
   ): Promise<{ _id: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/favorites`, {
+    const response = await fetch(`${API_BASE_URL}/favorites`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -70,13 +129,10 @@ export const movieService = {
   },
 
   async removeFavorite(favoriteId: string): Promise<void> {
-    const response = await fetch(
-      `${API_BASE_URL}/api/favorites/${favoriteId}`,
-      {
-        method: "DELETE",
-        headers: getHeaders(),
-      },
-    );
+    const response = await fetch(`${API_BASE_URL}/favorites/${favoriteId}`, {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
     if (!response.ok) throw new Error("Failed to remove from favorites");
   },
 
@@ -92,7 +148,7 @@ export const movieService = {
       cast?: string[];
     },
   ): Promise<{ _id: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/watched`, {
+    const response = await fetch(`${API_BASE_URL}/watched`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -105,7 +161,7 @@ export const movieService = {
   },
 
   async removeWatched(watchedId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/api/watched/${watchedId}`, {
+    const response = await fetch(`${API_BASE_URL}/watched/${watchedId}`, {
       method: "DELETE",
       headers: getHeaders(),
     });
@@ -113,19 +169,16 @@ export const movieService = {
   },
 
   async getUserFavorites(userId: string): Promise<Favorite[]> {
-    const response = await fetch(
-      `${API_BASE_URL}/api/favorites/user/${userId}`,
-      {
-        headers: getHeaders(),
-      },
-    );
+    const response = await fetch(`${API_BASE_URL}/favorites/user/${userId}`, {
+      headers: getHeaders(),
+    });
     if (!response.ok) throw new Error("Failed to fetch favorites");
     const data = await response.json();
     return data.data || [];
   },
 
   async getUserWatched(userId: string): Promise<Watched[]> {
-    const response = await fetch(`${API_BASE_URL}/api/watched/user/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/watched/user/${userId}`, {
       headers: getHeaders(),
     });
     if (!response.ok) throw new Error("Failed to fetch watched movies");
@@ -135,7 +188,7 @@ export const movieService = {
 
   async isFavorite(userId: string, movieId: number): Promise<boolean> {
     const response = await fetch(
-      `${API_BASE_URL}/api/favorites/check?userId=${userId}&movieId=${movieId}`,
+      `${API_BASE_URL}/favorites/check?userId=${userId}&movieId=${movieId}`,
       { headers: getHeaders() },
     );
     if (!response.ok) return false;
@@ -145,7 +198,7 @@ export const movieService = {
 
   async isWatched(userId: string, movieId: number): Promise<boolean> {
     const response = await fetch(
-      `${API_BASE_URL}/api/watched/check?userId=${userId}&movieId=${movieId}`,
+      `${API_BASE_URL}/watched/check?userId=${userId}&movieId=${movieId}`,
       { headers: getHeaders() },
     );
     if (!response.ok) return false;

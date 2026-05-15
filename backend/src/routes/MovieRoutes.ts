@@ -19,6 +19,8 @@ router.get("/filter", catchAsync(MovieController.getFiltered)); // GET /api/movi
 
 router.use(auth);
 
+router.get("/user/searched", catchAsync(MovieController.getMoviesByUser)); // GET /api/movies/user/searched - MUST be before /:movieId route
+
 router.post("/", catchAsync(MovieController.createMovie)); // POST /api/movies
 
 router.put("/:movieId", catchAsync(MovieController.updateMovie)); // PUT /api/movies/:movieId

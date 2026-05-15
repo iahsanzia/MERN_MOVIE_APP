@@ -5,16 +5,40 @@ import { AppError } from "../utils";
 class MovieController {
   async createMovie(req: Request, res: Response): Promise<void> {
     const movieData = req.body;
+    const userId = (req as any).userId;
 
     if (!movieData.title) {
       throw new AppError("Title is Required", 400);
     }
-    const movie = await MovieService.createMovie(movieData);
+    if (!userId) {
+      throw new AppError("User not authenticated", 401);
+    }
+
+    const movie = await MovieService.createMovie({
+      ...movieData,
+      userId,
+    });
 
     res.status(201).json({
       status: "success",
       message: "Movie created Successfully",
       data: movie,
+    });
+  }
+
+  async getMoviesByUser(req: Request, res: Response): Promise<void> {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+      throw new AppError("User not authenticated", 401);
+    }
+
+    const movies = await MovieService.getMoviesByUserId(userId);
+
+    res.status(200).json({
+      status: "success",
+      message: "User movies retrieved successfully",
+      data: movies,
     });
   }
 

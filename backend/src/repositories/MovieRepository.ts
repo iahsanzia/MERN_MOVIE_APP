@@ -6,6 +6,10 @@ class MovieRepository {
     return await movie.save();
   }
 
+  async findByUserId(userId: string): Promise<IMovie[]> {
+    return await Movie.find({ userId });
+  }
+
   async findByMovieId(movieId: string): Promise<IMovie | null> {
     return await Movie.findOne({ movieId });
   }
