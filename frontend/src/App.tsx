@@ -11,10 +11,8 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {}
           <Route path="/" element={<RootAuthPage />} />
 
-          {}
           <Route
             path="/preferences"
             element={
@@ -24,7 +22,6 @@ function App() {
             }
           />
 
-          {/* Home page - protected */}
           <Route
             path="/home"
             element={
@@ -34,7 +31,6 @@ function App() {
             }
           />
 
-          {/* Catch all - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

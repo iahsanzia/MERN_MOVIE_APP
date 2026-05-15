@@ -25,23 +25,19 @@ export function useLoginForm(navigate: NavigateFunction) {
 
     try {
       if (!formData.email.trim()) {
-        throw new Error("Email or username is required");
+        throw new Error("Email is required");
       }
 
       if (formData.password.length < 6) {
         throw new Error("Password must be at least 6 characters");
       }
 
-      // Backend accepts email or username in the email field
       const response = await loginUser(formData.email, formData.password);
 
-      // Extract user and token from response
       const { user, token } = response.data;
 
-      // Store user and token in auth context
       setAuth(user, token);
 
-      // Navigate to home page
       navigate("/home");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

@@ -6,12 +6,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // On mount, restore token and user from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
     if (storedToken) {
       setToken(storedToken);
-      // Optionally verify token with backend
+
       verifyTokenWithBackend(storedToken);
     } else {
       setIsLoading(false);
@@ -47,15 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleSetAuth = (newUser: User, authToken: string) => {
-    console.log("🔐 AuthProvider: Setting auth - User:", newUser);
-    console.log(
-      "🔐 AuthProvider: Setting auth - Token:",
-      authToken ? `${authToken.substring(0, 20)}...` : "NO TOKEN",
-    );
     setUser(newUser);
     setToken(authToken);
     localStorage.setItem("authToken", authToken);
-    console.log("🔐 AuthProvider: Token stored in localStorage");
   };
 
   const handleLogout = () => {
