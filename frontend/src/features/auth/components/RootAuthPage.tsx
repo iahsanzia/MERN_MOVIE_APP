@@ -11,7 +11,7 @@ export function RootAuthPage() {
     if (isAuthenticated) {
       navigate("/home", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, []);
 
   return <AuthPage />;
 }

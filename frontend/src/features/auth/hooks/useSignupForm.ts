@@ -29,19 +29,13 @@ export function useSignupForm(navigate: NavigateFunction) {
         throw new Error("Password must be at least 6 characters");
       }
 
-      console.log("📝 Signup: Sending signup request...");
       const response = await signupUser(formData);
-      console.log("✅ Signup: Response received", response.data);
 
-      // Extract user and token from response
       const { user, token } = response.data;
 
-      // Store user and token in auth context
-      console.log("🔐 Signup: Setting auth context with user:", user.username);
       setAuth(user, token);
 
-      // Navigate to preferences screen
-      console.log("➡️ Signup: Navigating to /preferences");
+      console.log("Signup: Navigating to /preferences");
       navigate("/preferences");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
