@@ -2,10 +2,12 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { NavigateFunction } from "react-router-dom";
 import { SignupFormData } from "../types/SignupFormData";
 import { signupUser } from "../services/authService";
-import { useAuth } from "../../../context/AuthContext";
+// import { useAuth } from "../../../context/AuthContext";
+import { useAppDispatch } from "../../../store/slices/hooks";
+import { setAuth } from "../../../store/slices/authSlice";
 
 export function useSignupForm(navigate: NavigateFunction) {
-  const { setAuth } = useAuth();
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<SignupFormData>({
     username: "",
     email: "",
@@ -33,7 +35,7 @@ export function useSignupForm(navigate: NavigateFunction) {
 
       const { user, token } = response.data;
 
-      setAuth(user, token);
+      dispatch(setAuth({ user, token }));
 
       console.log("Signup: Navigating to /preferences");
       navigate("/preferences");

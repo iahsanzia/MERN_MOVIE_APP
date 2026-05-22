@@ -2,10 +2,12 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { NavigateFunction } from "react-router-dom";
 import { LoginFormData } from "../types/LoginFormData";
 import { loginUser } from "../services/authService";
-import { useAuth } from "../../../context/AuthContext";
+// import { useAuth } from "../../../context/AuthContext";
+import { useAppDispatch } from "../../../store/slices/hooks";
+import { setAuth } from "../../../store/slices/authSlice";
 
 export function useLoginForm(navigate: NavigateFunction) {
-  const { setAuth } = useAuth();
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -36,7 +38,7 @@ export function useLoginForm(navigate: NavigateFunction) {
 
       const { user, token } = response.data;
 
-      setAuth(user, token);
+      dispatch(setAuth({ user, token }));
 
       navigate("/home");
     } catch (err) {
