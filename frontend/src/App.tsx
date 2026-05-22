@@ -7,10 +7,13 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { RootAuthPage } from "./features/auth/components/RootAuthPage";
 import { PreferencesScreen } from "./features/preferences/components/PreferencesScreen";
 import { Home } from "./pages/Home";
+// import {Provider} from "react-redux";
+// import {store} from "./store/store";
 
 function App() {
   return (
     <BrowserRouter>
+      {/* <Provider store={store}> */}
       <AuthProvider>
         <MoviesProvider>
           <Routes>
@@ -50,6 +53,7 @@ function App() {
           />
         </MoviesProvider>
       </AuthProvider>
+      {/* </Provider> */}
     </BrowserRouter>
   );
 }
