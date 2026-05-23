@@ -1,11 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MovieDetails, Favorite, Watched } from "../../features/movies/types";
-
-interface MovieState {
-  selectedMovie: MovieDetails | null;
-  favorites: Favorite[];
-  watched: Watched[];
-}
+import { MovieState } from "../types/movies";
 
 const initialState: MovieState = {
   selectedMovie: null,

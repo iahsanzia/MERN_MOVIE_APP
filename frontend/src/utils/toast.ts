@@ -1,6 +1,5 @@
 import { toast } from "react-toastify";
-
-export type ToastType = "success" | "error" | "info";
+import { ToastType } from "../services/types/toast";
 
 interface ToastOptions {
   duration?: number;
@@ -22,3 +21,6 @@ export const showToast = (
     draggable: true,
   });
 };
+
+// Re-export types for backward compatibility
+export type { ToastType } from "../services/types/toast";

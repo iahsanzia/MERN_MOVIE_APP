@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { SearchBox } from "../features/movies/components/SearchBox";
 import { MovieCarousel } from "../features/movies/components/MovieCarousel";
@@ -11,9 +11,14 @@ import { useSearchedMovies } from "../features/movies/hooks/useSearchedMovies";
 import { Movie, MovieDetails } from "../features/movies/types";
 import { movieService } from "../services/movieService";
 import { showToast } from "../utils/toast";
+import { useAuth } from "../store/slices/hooks";
+import { useAppDispatch } from "../store/slices/hooks";
+import { logout } from "../store/slices/authSlice";
 
 export const Home: React.FC = () => {
-  const { user, logout } = useAuth();
+  // const { user, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { trending, topRated, loading } = useMovies();
   const { favorites, watched, refetch } = useUserMovies(user?.id);
@@ -26,7 +31,8 @@ export const Home: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      // await logout();
+      dispatch(logout());
       navigate("/");
       showToast("Logged out successfully", "success");
     } catch (err) {

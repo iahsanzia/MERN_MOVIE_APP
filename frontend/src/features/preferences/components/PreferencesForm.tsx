@@ -1,6 +1,6 @@
 import React from "react";
-import { Genre, Language } from "../../../services/genreService";
 import { Preferences } from "../types/Preferences";
+import { Genre, Language } from "../../../services/types/genre";
 
 interface PreferencesFormProps {
   preferences: Preferences;

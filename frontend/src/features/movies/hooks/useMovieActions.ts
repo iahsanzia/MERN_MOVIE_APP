@@ -2,8 +2,14 @@ import { useState } from "react";
 import { Movie } from "../types";
 import { movieService } from "../../../services/movieService";
 import { showToast } from "../../../utils/toast";
-import { useMoviesContext } from "../../../context/MoviesContext";
-
+// import { useMoviesContext } from "../../../context/MoviesContext";
+import { useAppDispatch } from "../../../store/slices/hooks";
+import {
+  addFavorite,
+  removeFavorite,
+  addWatched,
+  removeWatched,
+} from "../../../store/slices/movieSlice";
 interface UseMovieActionsReturn {
   addToFavorite: (movie: Movie) => Promise<void>;
   removeFromFavorite: (favoriteId: string) => Promise<void>;
@@ -16,8 +22,7 @@ export const useMovieActions = (
   userId: string | undefined,
 ): UseMovieActionsReturn => {
   const [loading, setLoading] = useState(false);
-  const { addFavorite, removeFavorite, addWatched, removeWatched } =
-    useMoviesContext();
+  const dispatch = useAppDispatch();
 
   const addToFavorite = async (movie: Movie) => {
     if (!userId) {
@@ -36,16 +41,28 @@ export const useMovieActions = (
         releaseDate: movie.release_date,
       });
 
-      addFavorite({
-        _id: result._id,
-        userId,
-        movieId: movie.id,
-        title: movie.title,
-        posterPath: movie.poster_path,
-        rating: movie.vote_average,
-        summary: movie.overview,
-        releaseDate: movie.release_date,
-      });
+      // addFavorite({
+      //   _id: result._id,
+      //   userId,
+      //   movieId: movie.id,
+      //   title: movie.title,
+      //   posterPath: movie.poster_path,
+      //   rating: movie.vote_average,
+      //   summary: movie.overview,
+      //   releaseDate: movie.release_date,
+      // });
+      dispatch(
+        addFavorite({
+          _id: result._id,
+          userId,
+          movieId: movie.id,
+          title: movie.title,
+          posterPath: movie.poster_path,
+          rating: movie.vote_average,
+          summary: movie.overview,
+          releaseDate: movie.release_date,
+        }),
+      );
 
       showToast("Added to Favorites", "success");
     } catch (err) {
@@ -62,7 +79,8 @@ export const useMovieActions = (
     try {
       setLoading(true);
       await movieService.removeFavorite(favoriteId);
-      removeFavorite(favoriteId);
+      // removeFavorite(favoriteId);
+      dispatch(removeFavorite(favoriteId));
       showToast("Removed from Favorites", "success");
     } catch (err) {
       showToast(
@@ -92,16 +110,28 @@ export const useMovieActions = (
         cast: [],
       });
 
-      addWatched({
-        _id: result._id,
-        userId,
-        movieId: movie.id,
-        title: movie.title,
-        posterPath: movie.poster_path,
-        rating: movie.vote_average,
-        summary: movie.overview,
-        releaseDate: movie.release_date,
-      });
+      // addWatched({
+      //   _id: result._id,
+      //   userId,
+      //   movieId: movie.id,
+      //   title: movie.title,
+      //   posterPath: movie.poster_path,
+      //   rating: movie.vote_average,
+      //   summary: movie.overview,
+      //   releaseDate: movie.release_date,
+      // });
+      dispatch(
+        addWatched({
+          _id: result._id,
+          userId,
+          movieId: movie.id,
+          title: movie.title,
+          posterPath: movie.poster_path,
+          rating: movie.vote_average,
+          summary: movie.overview,
+          releaseDate: movie.release_date,
+        }),
+      );
 
       showToast("Added to Watched", "success");
     } catch (err) {
@@ -118,7 +148,8 @@ export const useMovieActions = (
     try {
       setLoading(true);
       await movieService.removeWatched(watchedId);
-      removeWatched(watchedId);
+      // removeWatched(watchedId);
+      dispatch(removeWatched(watchedId));
       showToast("Removed from Watched", "success");
     } catch (err) {
       showToast(

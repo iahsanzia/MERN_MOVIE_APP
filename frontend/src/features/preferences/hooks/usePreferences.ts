@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../context/AuthContext";
+// import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../store/slices/hooks";
 import { useNavigate } from "react-router-dom";
-import { Preferences, PreferencesFormData } from "../types/Preferences";
+import { Preferences } from "../types/Preferences";
 import { updatePreferences } from "../services/preferencesService";
-import {
-  fetchGenres,
-  fetchLanguages,
-  Genre,
-  Language,
-} from "../../../services/genreService";
+import { fetchGenres, fetchLanguages } from "../../../services/genreService";
+import { Genre, Language } from "../../../services/types/genre";
 
 export function usePreferences() {
   const { user } = useAuth();

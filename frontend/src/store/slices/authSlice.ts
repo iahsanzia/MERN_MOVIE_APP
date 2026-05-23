@@ -1,13 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "../../context/AuthContext";
-
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
+import { User, AuthState } from "../types/auth";
 
 const initialState: AuthState = {
   user: null,

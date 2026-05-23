@@ -1,15 +1,6 @@
+import { Genre, Language } from "./types/genre";
+
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
-export interface Genre {
-  id: number;
-  name: string;
-}
-
-export interface Language {
-  iso_639_1: string;
-  english_name: string;
-  name?: string;
-}
 
 export async function fetchGenres(): Promise<Genre[]> {
   try {
@@ -76,3 +67,6 @@ export async function fetchLanguages(): Promise<Language[]> {
     throw error;
   }
 }
+
+// Re-export types for backward compatibility
+export type { Genre, Language } from "./types/genre";
