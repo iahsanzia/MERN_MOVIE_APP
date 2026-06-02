@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:all",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "frontend/build",
   "public": true,
   "rewrites": [
