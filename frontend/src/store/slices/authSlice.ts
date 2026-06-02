@@ -2,45 +2,41 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { User, AuthState } from "../types/auth";
 
 const token = localStorage.getItem("authToken");
-
 const initialState: AuthState = {
   user: null,
-  token: token,
+  token,
   isAuthenticated: false,
-  isLoading: !!token, // Only load if we have a token to verify
+  isLoading: !!token,
   error: null,
 };
 
 export const verifyToken = createAsyncThunk(
   "auth/verify",
   async (authToken: string, { rejectWithValue }) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
       const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      const response = await fetch(`${apiUrl}/api/auth/verify`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        signal: controller.signal,
+      });
 
-      try {
-        const response = await fetch(`${apiUrl}/api/auth/verify`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          signal: controller.signal,
-        });
+      clearTimeout(timeoutId);
 
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const data = await response.json();
-          return data.data?.user || null;
-        } else {
-          return rejectWithValue("Token verification failed");
-        }
-      } finally {
-        clearTimeout(timeoutId);
+      if (response.ok) {
+        const data = await response.json();
+        return data.data?.user || null;
+      } else {
+        return rejectWithValue("Token verification failed");
       }
     } catch (error: any) {
+      clearTimeout(timeoutId);
       if (error.name === "AbortError") {
         return rejectWithValue("Token verification timeout");
       }

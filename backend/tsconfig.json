@@ -2,8 +2,8 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "commonjs",
+    "moduleResolution": "bundler",
     "target": "es2020",
     "types": ["node", "jest"],
     "lib": ["ES2020"],
