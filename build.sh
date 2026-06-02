@@ -2,15 +2,23 @@
 set -e
 
 echo "Installing backend dependencies..."
-npm --prefix backend install
+cd backend
+npm install
+cd ..
 
 echo "Installing frontend dependencies..."
-npm --prefix frontend install
+cd frontend
+npm install
+cd ..
 
 echo "Building backend..."
-npm --prefix backend run build
+cd backend
+npm run build
+cd ..
 
 echo "Building frontend..."
-npm --prefix frontend run build
+cd frontend
+npm run build
+cd ..
 
 echo "Build complete!"
