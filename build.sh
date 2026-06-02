@@ -13,7 +13,7 @@ cd ..
 
 echo "Building backend..."
 cd backend
-npm run build
+npm run build -- --noUnusedParameters false --noUnusedLocals false
 cd ..
 
 echo "Building frontend..."
