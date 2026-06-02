@@ -17,14 +17,5 @@
     "backend/api/index.ts": {
       "runtime": "nodejs20.x"
     }
-  },
-  "env": [
-    "MONGODB_URI",
-    "JWT_SECRET",
-    "TMDB_API_KEY",
-    "TMDB_BEARER_TOKEN",
-    "JWT_EXPIRES_IN",
-    "NODE_ENV",
-    "FRONTEND_URL"
-  ]
+  }
 }
