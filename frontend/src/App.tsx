@@ -62,18 +62,31 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { verifyToken } from "./store/slices/authSlice";
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { RootAuthPage } from "./features/auth/components/RootAuthPage";
 import { PreferencesScreen } from "./features/preferences/components/PreferencesScreen";
 import { Home } from "./pages/Home";
-import { Provider } from "react-redux";
-import { store } from "./store/store";
+import { AuthProvider } from "./context/AuthProvider";
 
-function App() {
+function AppContent() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      dispatch(verifyToken(token) as any);
+    }
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
-      <Provider store={store}>
+      <AuthProvider>
         <Routes>
           <Route path="/" element={<RootAuthPage />} />
 
@@ -109,8 +122,16 @@ function App() {
           pauseOnHover
           theme="dark"
         />
-      </Provider>
+      </AuthProvider>
     </BrowserRouter>
+  );
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   );
 }
 

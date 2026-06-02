@@ -8,10 +8,10 @@ export const useAppSelector = useSelector as <T>(
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
-  const { user, token, isAuthenticated } = useAppSelector(
+  const { user, token, isAuthenticated, isLoading } = useAppSelector(
     (state) => state.auth,
   );
-  return { user, token, isAuthenticated, dispatch };
+  return { user, token, isAuthenticated, isLoading, dispatch };
 };
 
 export const useMoviesContext = () => {

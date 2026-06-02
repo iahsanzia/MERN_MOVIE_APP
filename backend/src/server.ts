@@ -10,6 +10,10 @@ const env = getEnvironmentVariables();
 
 connectDB();
 
-app.listen(env.PORT, () => {
-  console.log(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
-});
+// Only listen on port when not running as a Vercel serverless function
+// Vercel serverless functions are handled by the api/index.ts export
+if (process.env.VERCEL_ENV === undefined) {
+  app.listen(env.PORT, () => {
+    console.log(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
+  });
+}

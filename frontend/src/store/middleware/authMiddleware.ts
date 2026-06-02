@@ -1,10 +1,11 @@
-// import { Middleware } from "@reduxjs/toolkit";
 import { verifyToken } from "../slices/authSlice";
-// import { RootState, AppDispatch } from "../store";
+
+let hasInitialized = false;
 
 export const authInitMiddleware =
   (store: any) => (next: any) => (action: unknown) => {
-    if ((action as any).type === "@@INIT") {
+    if (!hasInitialized) {
+      hasInitialized = true;
       const token = localStorage.getItem("authToken");
       if (token) {
         store.dispatch(verifyToken(token) as any);

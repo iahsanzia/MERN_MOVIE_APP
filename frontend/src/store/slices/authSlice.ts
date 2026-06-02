@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { User, AuthState } from "../types/auth";
 
+const token = localStorage.getItem("authToken");
+
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem("authToken"),
+  token: token,
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: !!token, // Only load if we have a token to verify
   error: null,
 };
 
@@ -13,25 +15,35 @@ export const verifyToken = createAsyncThunk(
   "auth/verify",
   async (authToken: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/auth/verify` ||
-          "http://localhost:5000/api/auth/verify",
-        {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+      try {
+        const response = await fetch(`${apiUrl}/api/auth/verify`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
           },
-        },
-      );
+          signal: controller.signal,
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        return data.data?.user || null;
-      } else {
-        return rejectWithValue("Token verification failed");
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+          return data.data?.user || null;
+        } else {
+          return rejectWithValue("Token verification failed");
+        }
+      } finally {
+        clearTimeout(timeoutId);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        return rejectWithValue("Token verification timeout");
+      }
       return rejectWithValue("Network error during token verification");
     }
   },
