@@ -42,15 +42,6 @@ class TmdbService {
         totalPages: response.data.results.length,
       };
     } catch (error: any) {
-      console.log("======== TMDB ERROR DEBUG ========");
-      console.log("Status:", error.response?.status);
-      console.log("Data:", JSON.stringify(error.response?.data, null, 2));
-      console.log("Params:", {
-        query,
-        page,
-      });
-      console.log("==================================");
-
       throw new Error(
         `TMDB Search Error: ${
           error.response?.data?.status_message || error.message

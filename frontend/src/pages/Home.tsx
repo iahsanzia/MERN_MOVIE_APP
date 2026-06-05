@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-// import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 import { SearchBox } from "../features/movies/components/SearchBox";
 import { MovieCarousel } from "../features/movies/components/MovieCarousel";
 import { MovieDetailsModal } from "../features/movies/components/MovieDetailsModal";
@@ -11,27 +12,29 @@ import { useSearchedMovies } from "../features/movies/hooks/useSearchedMovies";
 import { Movie, MovieDetails } from "../features/movies/types";
 import { movieService } from "../services/movieService";
 import { showToast } from "../utils/toast";
-import { useAuth } from "../store/slices/hooks";
-import { useAppDispatch } from "../store/slices/hooks";
+import { useAuth, useAppDispatch } from "../store/slices/hooks";
 import { logout } from "../store/slices/authSlice";
 
 export const Home: React.FC = () => {
-  // const { user, logout } = useAuth();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const { trending, topRated, loading } = useMovies();
-  const { favorites, watched, refetch } = useUserMovies(user?.id);
+  useUserMovies(user?.id);
   const { addToFavorite, removeFromFavorite, addToWatched, removeFromWatched } =
     useMovieActions(user?.id);
   const { searchedMovies, refetch: refetchSearched } = useSearchedMovies(
     user?.id,
   );
+
+  const favorites = useSelector((state: RootState) => state.movies.favorites);
+  const watched = useSelector((state: RootState) => state.movies.watched);
+
   const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
 
   const handleLogout = async () => {
     try {
-      // await logout();
       dispatch(logout());
       navigate("/");
       showToast("Logged out successfully", "success");
@@ -40,25 +43,23 @@ export const Home: React.FC = () => {
     }
   };
 
-  const handlePreferences = () => {
-    navigate("/preferences");
-  };
+  const handlePreferences = () => navigate("/preferences");
 
   const handleMovieClick = async (movie: Movie) => {
     try {
       const details = await movieService.getMovieDetails(movie.id);
       setMovieDetails(details);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to fetch movie details";
-      showToast(message, "error");
+      showToast(
+        err instanceof Error ? err.message : "Failed to fetch movie details",
+        "error",
+      );
     }
   };
 
   const handleAddToFavorite = async () => {
     if (movieDetails) {
       await addToFavorite(movieDetails);
-      await refetch();
       setMovieDetails(null);
     }
   };
@@ -67,7 +68,6 @@ export const Home: React.FC = () => {
     const favorite = favorites.find((f) => f.movieId === movieDetails?.id);
     if (favorite) {
       await removeFromFavorite(favorite._id);
-      await refetch();
       setMovieDetails(null);
     }
   };
@@ -75,7 +75,6 @@ export const Home: React.FC = () => {
   const handleAddToWatched = async () => {
     if (movieDetails) {
       await addToWatched(movieDetails);
-      await refetch();
       setMovieDetails(null);
     }
   };
@@ -84,17 +83,13 @@ export const Home: React.FC = () => {
     const watchMovie = watched.find((w) => w.movieId === movieDetails?.id);
     if (watchMovie) {
       await removeFromWatched(watchMovie._id);
-      await refetch();
       setMovieDetails(null);
     }
   };
 
   const handleMovieSuggestionSelect = async (movie: Movie) => {
     try {
-      // Fetch full movie details from TMDB
       const fullDetails = await movieService.getMovieDetails(movie.id);
-
-      // Prepare data for movie creation
       const movieData = {
         movieId: movie.id,
         title: fullDetails.title || movie.title,
@@ -102,19 +97,13 @@ export const Home: React.FC = () => {
         releaseDate: fullDetails.release_date || movie.release_date,
         posterPath: movie.poster_path,
         genres: (fullDetails.genres?.map((g: any) => g.name) || []) as string[],
-        director: "Unknown", // TMDB API doesn't provide director in basic response
+        director: "Unknown",
         cast: (fullDetails.credits?.cast?.slice(0, 5).map((c: any) => c.name) ||
           []) as string[],
         rating: fullDetails.vote_average || movie.vote_average,
       };
-
-      console.log("Creating movie with data:", movieData);
-
-      // Create movie in database
       await movieService.createMovie(movieData);
       showToast(`${movie.title} added to your collection!`, "success");
-
-      // Refetch searched movies to display the newly created movie
       await refetchSearched();
     } catch (err) {
       const message =
@@ -138,7 +127,7 @@ export const Home: React.FC = () => {
           "linear-gradient(to bottom, #8B0000 0%, #4a0000 15%, #1a0000 35%, #0d0000 55%, #000000 75%)",
       }}
     >
-      {/* Header with User Info and Buttons */}
+      {/* Header */}
       <div className="flex justify-between items-center px-8 py-4 bg-black bg-opacity-50 border-b border-gray-700">
         <h1 className="text-3xl font-bold text-white">🍿 PopinForMovies</h1>
         <div className="flex items-center gap-4">
@@ -194,9 +183,8 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <div className="relative min-h-[320px] py-16 flex flex-col items-center justify-center px-4">
-        {/* Red glow at top */}
         <div
           className="absolute inset-0 opacity-30"
           style={{
@@ -224,7 +212,6 @@ export const Home: React.FC = () => {
           favorites={favoriteIds}
           watched={watchedIds}
         />
-
         <MovieCarousel
           title="Top Rated"
           movies={topRated}
@@ -235,7 +222,6 @@ export const Home: React.FC = () => {
           favorites={favoriteIds}
           watched={watchedIds}
         />
-
         {searchedMovies.length > 0 && (
           <MovieCarousel
             title="Searched Movies"
@@ -247,7 +233,6 @@ export const Home: React.FC = () => {
             watched={watchedIds}
           />
         )}
-
         {favorites.length > 0 && (
           <MovieCarousel
             title="My Favorites"
@@ -273,7 +258,6 @@ export const Home: React.FC = () => {
             watched={watchedIds}
           />
         )}
-
         {watched.length > 0 && (
           <MovieCarousel
             title="My Watched"

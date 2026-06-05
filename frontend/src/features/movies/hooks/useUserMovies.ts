@@ -1,10 +1,9 @@
-import { useEffect, useState, useCallback } from "react";
-import { Favorite, Watched } from "../types";
+import { useEffect, useCallback, useState } from "react";
 import { movieService } from "../../../services/movieService";
+import { useAppDispatch } from "../../../store/slices/hooks";
+import { setFavorites, setWatched } from "../../../store/slices/movieSlice";
 
 interface UseUserMoviesReturn {
-  favorites: Favorite[];
-  watched: Watched[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -13,15 +12,14 @@ interface UseUserMoviesReturn {
 export const useUserMovies = (
   userId: string | undefined,
 ): UseUserMoviesReturn => {
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const [watched, setWatched] = useState<Watched[]>([]);
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserMovies = useCallback(async () => {
     if (!userId) {
-      setFavorites([]);
-      setWatched([]);
+      dispatch(setFavorites([]));
+      dispatch(setWatched([]));
       return;
     }
 
@@ -32,8 +30,8 @@ export const useUserMovies = (
         movieService.getUserWatched(userId),
       ]);
 
-      setFavorites(favData);
-      setWatched(watchData);
+      dispatch(setFavorites(favData)); // ← seeds Redux
+      dispatch(setWatched(watchData)); // ← seeds Redux
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch user movies",
@@ -41,11 +39,11 @@ export const useUserMovies = (
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, dispatch]);
 
   useEffect(() => {
     fetchUserMovies();
   }, [fetchUserMovies]);
 
-  return { favorites, watched, loading, error, refetch: fetchUserMovies };
+  return { loading, error, refetch: fetchUserMovies };
 };

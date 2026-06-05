@@ -22,5 +22,4 @@ export const showToast = (
   });
 };
 
-// Re-export types for backward compatibility
 export type { ToastType } from "../services/types/toast";

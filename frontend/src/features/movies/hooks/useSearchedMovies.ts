@@ -30,7 +30,6 @@ export const useSearchedMovies = (
       console.log("[useSearchedMovies] Fetching movies for userId:", userId);
       const movies = await movieService.getUserSearchedMovies(userId);
       console.log("Raw movies from API:", movies);
-      // Map database Movie model to frontend Movie type
       const formattedMovies: Movie[] = movies.map((movie: any) => {
         console.log("Mapping movie:", {
           title: movie.title,
@@ -40,7 +39,7 @@ export const useSearchedMovies = (
         return {
           id: movie.movieId ? parseInt(movie.movieId) : 0,
           title: movie.title,
-          poster_path: movie.posterPath || "", // Note: might not be available from DB
+          poster_path: movie.posterPath || "",
           vote_average: movie.rating,
           overview: movie.summary,
           release_date: movie.releaseDate,
